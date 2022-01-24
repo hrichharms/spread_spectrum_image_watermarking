@@ -16,7 +16,6 @@ def similarity(a: ndarray, b: ndarray):
     """
     Estimation of similarity between two equal length arrays.
     """
-    print(dot(b, a), dot(b, b))
     return dot(b, a) / sqrt(dot(b, b))
 
 
