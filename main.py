@@ -13,11 +13,17 @@ from insertion_functions import formula1, formula1_i
 
 
 def similarity(a: ndarray, b: ndarray):
+    """
+    Estimation of similarity between two equal length arrays.
+    """
     print(dot(b, a), dot(b, b))
     return dot(b, a) / sqrt(dot(b, b))
 
 
 def generate_watermark(n: int):
+    """
+    Generates standard gaussian distributed ndarray of length n.
+    """
     return randn(n)
 
 
@@ -27,6 +33,9 @@ def insert_watermark(
     alpha: float,
     insertion_function: Callable[[float, float, float], float] = formula1,
 ) -> ndarray:
+    """
+    Inserts watermark into highest magnitude DCT coefficients of image.
+    """
 
     # ensure image dtype is set to float
     if image.dtype != float:
@@ -60,6 +69,9 @@ def extract_watermark(
     alpha: float,
     insertion_function_i: Callable[[float, float, float], float] = formula1_i
 ) -> ndarray:
+    """
+    Extracts watermark of specified length from DCT coefficients of distorted image.
+    """
 
     # compute transform domain of both images
     original_transform_domain = dctn(original_image)
