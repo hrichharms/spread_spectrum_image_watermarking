@@ -96,40 +96,90 @@ def extract_watermark(
     return watermark
 
 
+def main(
+    inserting: bool,
+    filename_1: str,
+    filename_2: str,
+    watermark_filename: str,
+    n: int,
+    alpha: float
+) -> None:
+
+    from cv2 import imread, imwrite
+    from json import dump, load
+
+    if inserting:
+
+        # generate watermark
+        watermark = generate_watermark(n)
+
+        # write watermark to watermark filename
+        with open(watermark_filename, "w") as watermark_file:
+            dump(watermark.tolist(), watermark_file)
+
+        # write watermarked image to output filename
+        imwrite(filename_2, insert_watermark(imread(filename_1), watermark, alpha))
+
+    else:
+
+        # read watermark from watermark filename
+        with open(watermark_filename) as watermark_file:
+            watermark_1 = load(watermark_file)
+
+        # extract watermark from second image
+        watermark_2 = extract_watermark(imread(filename_1), imread(filename_2), n, alpha)
+
+        # calculate and output similarity between stored and extracted watermarks
+        print(f"Similarity: {similarity(watermark_1, watermark_2):.2f}")
+
+
 if __name__ == "__main__":
 
-    from sys import argv
-    from cv2 import imread, imwrite
+    import argparse
 
-    n = 4096
-    alpha = 0.1
 
-    # generate watermark using standard gaussian distribution
-    watermark = generate_watermark(n)
+    parser = argparse.ArgumentParser(
+        description="Insert or compare spread spectrum watermarks into high magnitude DCT coefficients."
+    )
+    mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument("-i", action="store_true", help="insertion mode")
+    mode_group.add_argument("-c", action="store_true", help="comparison mode")
+    parser.add_argument(
+        "image_1",
+        metavar="IMAGE_1",
+        type=str,
+        help="original image for insertion or comparison, depending upon selected mode"
+    )
+    parser.add_argument(
+        "image_2",
+        metavar="IMAGE_2",
+        type=str,
+        help="watermarked output filename or second image for comparison, depending upon selected mode"
+    )
+    parser.add_argument(
+        "-w",
+        metavar="WATERMARK_FILENAME",
+        type=str,
+        help="watermark filename for storage during insertion mode or retreival during comparison mode",
+        default="watermark.json",
+        required=False
+    )
+    parser.add_argument(
+        "-n",
+        metavar="WATERMARK_LEN",
+        type=int,
+        help="watermark length",
+        default=4096,
+        required=False
+    )
+    parser.add_argument(
+        "-a",
+        metavar="ALPHA",
+        type=float,
+        help="watermark scaling factor",
+        default=0.1,
+        required=False
+    )
+    args = parser.parse_args()
 
-    # read specified input image
-    img = imread(argv[1])
-
-    # watermark image
-    watermarked = insert_watermark(img, watermark, alpha)
-
-    # open comparison image
-    comparison_img = imread(argv[2])
-
-    # extract watermark from comparison image
-    comparison_watermark = extract_watermark(img, comparison_img, n, alpha)
-
-    # calculate and output similarity between extracted watermark and original watermark
-    print(similarity(watermark, comparison_watermark))
-
-    # # write watermarked image to specified filename
-    # imwrite(argv[2], watermarked)
-
-    # # open quantized image
-    # quantized = imread(argv[2])
-
-    # # extract watermark from quantized image
-    # extracted_watermark = extract_watermark(img, quantized, n, alpha, formula1_i)
-
-    # # calculate and output similarity of extracted watermark from inserted watermark
-    # print(similarity(watermark, extracted_watermark))
+    main(args.i == True, args.image_1, args.image_2, args.w, args.n, args.a)
