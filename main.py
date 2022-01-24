@@ -85,7 +85,14 @@ def extract_watermark(
     # retreive watermark from most significant coefficients of distorted image
     watermark = array([], dtype=float)
     for i in coefficients:
-        watermark = append(watermark, insertion_function_i(distorted_transform_domain[i], original_transform_domain[i], alpha))
+        watermark = append(
+            watermark,
+            insertion_function_i(
+                distorted_transform_domain[i],
+                original_transform_domain[i],
+                alpha
+            )
+        )
 
     # return extracted watermark
     return watermark
