@@ -36,10 +36,6 @@ def insert_watermark(
     Inserts watermark into highest magnitude DCT coefficients of image.
     """
 
-    # ensure image dtype is set to float
-    if image.dtype != float:
-        image = image.astype(float)
-
     # compute transform domain of image
     transform_domain = dctn(image)
 
