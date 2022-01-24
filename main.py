@@ -12,14 +12,14 @@ from typing import Callable
 from insertion_functions import formula1, formula1_i
 
 
-def similarity(a: ndarray, b: ndarray):
+def similarity(a: ndarray, b: ndarray) -> float:
     """
     Estimation of similarity between two equal length arrays.
     """
     return dot(b, a) / sqrt(dot(b, b))
 
 
-def generate_watermark(n: int):
+def generate_watermark(n: int) -> ndarray:
     """
     Generates standard gaussian distributed ndarray of length n.
     """
